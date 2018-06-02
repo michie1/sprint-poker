@@ -29,7 +29,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { name = "Hello", points = Nothing }, Cmd.none )
+    ( { name = "H!ello", points = Nothing }, Cmd.none )
 
 
 
