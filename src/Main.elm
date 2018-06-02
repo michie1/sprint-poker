@@ -4,14 +4,16 @@ import Html exposing (Html, div, h2, text, program, input, button, ul, li)
 import Html.Attributes exposing (value)
 import Html.Events exposing (onBlur, onClick, on, targetValue)
 import Json.Decode as Json
-
 import App.OutsideInfo
 import App.Msg as Msg exposing (Msg)
 import Data.User exposing (User)
 
+
 onBlurWithTargetValue : (String -> msg) -> Html.Attribute msg
 onBlurWithTargetValue tagger =
     on "blur" (Json.map tagger targetValue)
+
+
 
 -- MODEL
 
@@ -54,8 +56,8 @@ init =
 
 view : Model -> Html Msg
 view model =
-    case (model.uid, model.users) of
-        (Just uid, Just users) ->
+    case ( model.uid, model.users ) of
+        ( Just uid, Just users ) ->
             div []
                 [ ul []
                     [ li [] [ text model.name ]
@@ -69,6 +71,7 @@ view model =
                 , h2 [] [ text "Users" ]
                 , ul [] <| List.map (\user -> li [] [ text user.name ]) users
                 ]
+
         _ ->
             div [] [ text "Connecting ..." ]
 
@@ -84,15 +87,19 @@ update msg model =
             ( model, Cmd.none )
 
         Msg.SetName name ->
-            if name == "" then
-                case model.uid of
-                    Just uid ->
-                        ( { model | name = uid }, Cmd.none )
-                    Nothing ->
-                        ( { model | name = "" }, Cmd.none )
-            else
-                ( { model | name = name }, Cmd.none )
+            let
+                newName =
+                    if name == "" then
+                        case model.uid of
+                            Just uid ->
+                                uid
 
+                            Nothing ->
+                                ""
+                    else
+                        name
+            in
+                ( { model | name = newName }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.SetName newName )
 
         Msg.SetPoints points ->
             ( { model | points = Just points }, Cmd.none )

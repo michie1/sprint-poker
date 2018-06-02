@@ -18,6 +18,9 @@ sendInfoOutside info =
         Hi payload ->
             infoForOutside { tag = "Hi", data = payload }
 
+        SetName name ->
+            infoForOutside { tag = "SetName", data = Json.Encode.string name }
+
         LogError err ->
             infoForOutside { tag = "LogError", data = Json.Encode.string err }
 
@@ -35,7 +38,7 @@ getInfoFromOutside tagger onError =
                             Err e ->
                                 onError e
 
-                    "signedIn" ->
+                    "SignedIn" ->
                         case decodeValue Json.Decode.string outsideInfo.data of
                             Ok id ->
                                 tagger <| SignedIn id
@@ -43,7 +46,7 @@ getInfoFromOutside tagger onError =
                             Err e ->
                                 onError e
 
-                    "users" ->
+                    "UsersLoaded" ->
                         let
                             _ = Debug.log "hoi3" outsideInfo
                         in
@@ -60,6 +63,7 @@ getInfoFromOutside tagger onError =
 
 type InfoForOutside
     = Hi Json.Encode.Value
+    | SetName String
     | LogError String
 
 

@@ -3,10 +3,6 @@ import('./src/Main.elm').then(Elm => {
   const app = Elm.Main.embed(mountNode);
   const config = require('./config');
 
-  app.ports.infoForOutside.subscribe(function (msg) {
-    console.log('msg', msg);
-  });
-
 
   firebase.initializeApp(config);
    firebase.auth().onAuthStateChanged(function(user) {
@@ -14,7 +10,7 @@ import('./src/Main.elm').then(Elm => {
     if (user !== null) {
 
       app.ports.infoForElm.send({
-        tag: 'signedIn',
+        tag: 'SignedIn',
         data: user.uid
       });
 
@@ -41,9 +37,17 @@ import('./src/Main.elm').then(Elm => {
         console.log(snap.val());
 
         app.ports.infoForElm.send({
-          tag: 'users',
+          tag: 'UsersLoaded',
           data: Object.values(snap.val())
         });
+      });
+
+      app.ports.infoForOutside.subscribe(function (msg) {
+        if (msg.tag == 'SetName') {
+          userRef.update({
+            name: msg.data
+          });
+        }
       });
     } else {
       firebase.auth().signInAnonymously();
