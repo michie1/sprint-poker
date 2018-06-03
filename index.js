@@ -19,7 +19,7 @@ import('./src/Main.elm').then(Elm => {
       userRef.set({
         uid: user.uid,
         name: user.uid,
-        score: null
+        points: null
       });
 
       // Add ourselves to presence list when online.
@@ -46,6 +46,10 @@ import('./src/Main.elm').then(Elm => {
         if (msg.tag == 'SetName') {
           userRef.update({
             name: msg.data
+          });
+        } else if (msg.tag == 'SetPoints') {
+          userRef.update({
+            points: msg.data
           });
         }
       });

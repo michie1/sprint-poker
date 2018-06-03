@@ -21,6 +21,9 @@ sendInfoOutside info =
         SetName name ->
             infoForOutside { tag = "SetName", data = Json.Encode.string name }
 
+        SetPoints points ->
+            infoForOutside { tag = "SetPoints", data = Json.Encode.int points }
+
         LogError err ->
             infoForOutside { tag = "LogError", data = Json.Encode.string err }
 
@@ -48,7 +51,7 @@ getInfoFromOutside tagger onError =
 
                     "UsersLoaded" ->
                         let
-                            _ = Debug.log "hoi3" outsideInfo
+                            _ = Debug.log "hoi3" (decodeValue usersDecoder outsideInfo.data)
                         in
                             case decodeValue usersDecoder outsideInfo.data of
                                 Ok users ->
@@ -64,6 +67,7 @@ getInfoFromOutside tagger onError =
 type InfoForOutside
     = Hi Json.Encode.Value
     | SetName String
+    | SetPoints Int
     | LogError String
 
 

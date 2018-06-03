@@ -69,7 +69,7 @@ view model =
                     List.map (\points -> button [ onClick <| Msg.SetPoints points ] [ text (toString points) ]) effortPoints
                 , button [ onClick Msg.Reset ] [ text "Reset" ]
                 , h2 [] [ text "Users" ]
-                , ul [] <| List.map (\user -> li [] [ text user.name ]) users
+                , ul [] <| List.map (\user -> li [] [ text (user.name ++ " - " ++ toString user.points)]) users
                 ]
 
         _ ->
@@ -102,7 +102,7 @@ update msg model =
                 ( { model | name = newName }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.SetName newName )
 
         Msg.SetPoints points ->
-            ( { model | points = Just points }, Cmd.none )
+            ( { model | points = Just points }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.SetPoints points )
 
         Msg.Reset ->
             ( { model | points = Nothing }, Cmd.none )
