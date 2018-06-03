@@ -105,7 +105,7 @@ update msg model =
             ( { model | points = Just points }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.SetPoints points )
 
         Msg.Reset ->
-            ( { model | points = Nothing }, Cmd.none )
+            ( { model | points = Nothing }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.Reset )
 
         Msg.Outside infoForElm ->
             case infoForElm of

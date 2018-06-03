@@ -24,6 +24,9 @@ sendInfoOutside info =
         SetPoints points ->
             infoForOutside { tag = "SetPoints", data = Json.Encode.int points }
 
+        Reset ->
+            infoForOutside { tag = "Reset", data = Json.Encode.bool True }
+
         LogError err ->
             infoForOutside { tag = "LogError", data = Json.Encode.string err }
 
@@ -68,6 +71,7 @@ type InfoForOutside
     = Hi Json.Encode.Value
     | SetName String
     | SetPoints Int
+    | Reset
     | LogError String
 
 

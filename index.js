@@ -51,6 +51,14 @@ import('./src/Main.elm').then(Elm => {
           userRef.update({
             points: msg.data
           });
+        } else if (msg.tag == 'Reset') {
+          const updates = {};
+          listRef.once('value', (users) => {
+            users.forEach((user) => {
+              updates[user.key + '/points'] = null;
+            });
+          });
+          listRef.update(updates);
         }
       });
     } else {
