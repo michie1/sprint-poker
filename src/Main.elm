@@ -69,11 +69,42 @@ view model =
                     List.map (\points -> button [ onClick <| Msg.SetPoints points ] [ text (toString points) ]) effortPoints
                 , button [ onClick Msg.Reset ] [ text "Reset" ]
                 , h2 [] [ text "Users" ]
-                , ul [] <| List.map (\user -> li [] [ text (user.name ++ " - " ++ toString user.points)]) users
+                , showPoints users
                 ]
 
         _ ->
             div [] [ text "Connecting ..." ]
+
+
+showPoints : List User -> Html Msg
+showPoints users =
+    let
+        noNothingPoints =
+            List.length (List.filter (\user -> user.points == Nothing) users) == 0
+    in
+        ul [] <|
+            List.map
+                (\user ->
+                    let
+                        points =
+                            if noNothingPoints then
+                                case user.points of
+                                    Just val ->
+                                        toString val
+
+                                    Nothing ->
+                                        "0"
+                            else
+                                case user.points of
+                                    Just val ->
+                                        "Answered"
+
+                                    Nothing ->
+                                        "Waiting for answer"
+                    in
+                        li [] [ text (user.name ++ " - " ++ points) ]
+                )
+                users
 
 
 
