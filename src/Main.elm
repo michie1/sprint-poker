@@ -151,7 +151,24 @@ update msg model =
                         ( model, Cmd.none )
 
                 App.OutsideInfo.Users users ->
-                    ( { model | users = Just users }, Cmd.none )
+                    let
+                        points =
+                            case
+                                (List.head <|
+                                    List.filter
+                                        (\user ->
+                                            model.name == user.name
+                                        )
+                                        users
+                                )
+                            of
+                                Just user ->
+                                    user.points
+
+                                Nothing ->
+                                    model.points
+                    in
+                        ( { model | users = Just users, points = points }, Cmd.none )
 
         Msg.LogErr err ->
             ( model, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.LogError err )
