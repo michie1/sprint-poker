@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Html exposing (Html, div, h2, text, program, input, button, ul, li)
+import Html exposing (Html, span, div, h2, text, program, input, button, ul, li)
 import Html.Attributes exposing (value)
 import Html.Events exposing (onInput, onClick, on, targetValue)
 import Json.Decode as Json
@@ -30,6 +30,7 @@ type alias Model =
     , uid : Maybe String
     , points : Maybe Int
     , users : Maybe (List User)
+    , removed : Bool
     }
 
 
@@ -39,6 +40,7 @@ init =
       , uid = Nothing
       , points = Nothing
       , users = Nothing
+      , removed = False
       }
     , Cmd.none
     )
@@ -50,8 +52,11 @@ init =
 
 view : Model -> Html Msg
 view model =
-    case ( model.uid, model.users ) of
-        ( Just uid, Just users ) ->
+    case ( model.uid, model.users, model.removed ) of
+        ( _, _, True ) ->
+            div [] [ text "Removed" ]
+
+        ( Just uid, Just users, _ ) ->
             div []
                 [ ul []
                     [ li [] [ text model.name ]
@@ -63,15 +68,15 @@ view model =
                     List.map (\points -> button [ onClick <| Msg.SetPoints points ] [ text (toString points) ]) effortPoints
                 , button [ onClick Msg.Reset ] [ text "Reset" ]
                 , h2 [] [ text "Users" ]
-                , showPoints users
+                , showUsers users
                 ]
 
         _ ->
             div [] [ text "Connecting ..." ]
 
 
-showPoints : List User -> Html Msg
-showPoints users =
+showUsers : List User -> Html Msg
+showUsers users =
     let
         noNothingPoints =
             List.length (List.filter (\user -> user.points == Nothing) users) == 0
@@ -96,7 +101,11 @@ showPoints users =
                                     Nothing ->
                                         "Waiting for answer"
                     in
-                        li [] [ text (user.name ++ " - " ++ points) ]
+                        li []
+                            [ span [] [ text (user.name ++ " - " ++ points) ]
+                            , span [] [ text " - " ]
+                            , button [ onClick <| Msg.RemoveUser user.uid ] [ text "Remove" ]
+                            ]
                 )
                 users
 
@@ -126,24 +135,19 @@ update msg model =
             in
                 ( { model | name = newName }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.SetName newName )
 
-
         Msg.SetPoints points ->
             ( { model | points = Just points }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.SetPoints points )
 
         Msg.Reset ->
             ( { model | points = Nothing }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.Reset )
 
+        Msg.RemoveUser uid ->
+            ( model, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.RemoveUser uid )
+
         Msg.Outside infoForElm ->
             case infoForElm of
                 App.OutsideInfo.SignedIn uid ->
                     ( { model | uid = Just uid, name = uid }, Cmd.none )
-
-                App.OutsideInfo.ByeLoaded value ->
-                    let
-                        _ =
-                            Debug.log "3bye loaded" value
-                    in
-                        ( model, Cmd.none )
 
                 App.OutsideInfo.Users users ->
                     let
@@ -164,6 +168,9 @@ update msg model =
                                     model.points
                     in
                         ( { model | users = Just users, points = points }, Cmd.none )
+
+                App.OutsideInfo.UserRemoved ->
+                    ( { model | removed = True }, Cmd.none )
 
         Msg.LogErr err ->
             ( model, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.LogError err )

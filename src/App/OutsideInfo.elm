@@ -27,6 +27,9 @@ sendInfoOutside info =
         Reset ->
             infoForOutside { tag = "Reset", data = Json.Encode.bool True }
 
+        RemoveUser uid ->
+            infoForOutside { tag = "RemoveUser", data = Json.Encode.string uid }
+
         LogError err ->
             infoForOutside { tag = "LogError", data = Json.Encode.string err }
 
@@ -36,14 +39,6 @@ getInfoFromOutside tagger onError =
     infoForElm
         (\outsideInfo ->
                 case outsideInfo.tag of
-                    "Bye" ->
-                        case decodeValue Json.Decode.string outsideInfo.data of
-                            Ok value ->
-                                    tagger <| ByeLoaded value
-
-                            Err e ->
-                                onError e
-
                     "SignedIn" ->
                         case decodeValue Json.Decode.string outsideInfo.data of
                             Ok id ->
@@ -53,15 +48,21 @@ getInfoFromOutside tagger onError =
                                 onError e
 
                     "UsersLoaded" ->
-                        let
-                            _ = Debug.log "hoi3" (decodeValue usersDecoder outsideInfo.data)
-                        in
                             case decodeValue usersDecoder outsideInfo.data of
                                 Ok users ->
                                     tagger <| Users users
 
                                 Err e ->
                                     onError e
+
+                    "UserRemoved" ->
+                        case decodeValue Json.Decode.bool outsideInfo.data of
+                            Ok _ ->
+                                tagger <| UserRemoved
+
+                            Err e ->
+                                onError e
+                            
                     _ ->
                         onError <| "Unexpected info from outside: " ++ toString outsideInfo
         )
@@ -72,12 +73,13 @@ type InfoForOutside
     | SetName String
     | SetPoints Int
     | Reset
+    | RemoveUser String
     | LogError String
 
 
 type InfoForElm
-    = ByeLoaded String
-    | SignedIn String
+    = SignedIn String
+    | UserRemoved
     | Users (List User)
 
 type alias GenericOutsideData =

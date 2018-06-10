@@ -6,7 +6,6 @@ import('./src/Main.elm').then(Elm => {
 
   firebase.initializeApp(config);
    firebase.auth().onAuthStateChanged(function(user) {
-    console.log('user', user);
     if (user !== null) {
 
       app.ports.infoForElm.send({
@@ -31,24 +30,34 @@ import('./src/Main.elm').then(Elm => {
         }
       });
 
-      // Number of online users is the number of objects in the presence list.
       listRef.on("value", function(snap) {
         app.ports.infoForElm.send({
           tag: 'UsersLoaded',
-          data: Object.values(snap.val())
+          data: Object.values(snap.val() || {})
         });
       });
 
+
+      listRef.on('child_removed', function(removedUser) {
+        if (removedUser.val().uid === user.uid) {
+          userRef.remove();
+          app.ports.infoForElm.send({
+            tag: 'UserRemoved',
+            data: true
+          });
+        }
+      });
+
       app.ports.infoForOutside.subscribe(function (msg) {
-        if (msg.tag == 'SetName') {
+        if (msg.tag === 'SetName') {
           userRef.update({
             name: msg.data
           });
-        } else if (msg.tag == 'SetPoints') {
+        } else if (msg.tag === 'SetPoints') {
           userRef.update({
             points: msg.data
           });
-        } else if (msg.tag == 'Reset') {
+        } else if (msg.tag === 'Reset') {
           const updates = {};
           listRef.once('value', (users) => {
             users.forEach((user) => {
@@ -56,6 +65,14 @@ import('./src/Main.elm').then(Elm => {
             });
           });
           listRef.update(updates);
+        } else if (msg.tag === 'RemoveUser') {
+          listRef.once('value', (users) => {
+            users.forEach((user) => {
+              if (user.val().uid === msg.data) {
+                user.getRef().remove();
+              }
+            });
+          });
         }
       });
     } else {
