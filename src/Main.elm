@@ -2,17 +2,11 @@ module Main exposing (..)
 
 import Html exposing (Html, div, h2, text, program, input, button, ul, li)
 import Html.Attributes exposing (value)
-import Html.Events exposing (onBlur, onClick, on, targetValue)
+import Html.Events exposing (onInput, onClick, on, targetValue)
 import Json.Decode as Json
 import App.OutsideInfo
 import App.Msg as Msg exposing (Msg)
 import Data.User exposing (User)
-
-
-onBlurWithTargetValue : (String -> msg) -> Html.Attribute msg
-onBlurWithTargetValue tagger =
-    on "blur" (Json.map tagger targetValue)
-
 
 
 -- MODEL
@@ -63,7 +57,7 @@ view model =
                     [ li [] [ text model.name ]
                     , li [] [ text uid ]
                     , li [] [ text <| toString model.points ]
-                    , li [] [ input [ onBlurWithTargetValue Msg.SetName, value model.name ] [], button [] [ text "set name" ] ]
+                    , li [] [ input [ onInput Msg.OnInputName, value model.name ] [] ]
                     ]
                 , div [] <|
                     List.map (\points -> button [ onClick <| Msg.SetPoints points ] [ text (toString points) ]) effortPoints
@@ -117,7 +111,7 @@ update msg model =
         Msg.Noop ->
             ( model, Cmd.none )
 
-        Msg.SetName name ->
+        Msg.OnInputName name ->
             let
                 newName =
                     if name == "" then
@@ -131,6 +125,7 @@ update msg model =
                         name
             in
                 ( { model | name = newName }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.SetName newName )
+
 
         Msg.SetPoints points ->
             ( { model | points = Just points }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.SetPoints points )
@@ -157,7 +152,7 @@ update msg model =
                                 (List.head <|
                                     List.filter
                                         (\user ->
-                                            model.name == user.name
+                                            model.uid == (Just user.uid)
                                         )
                                         users
                                 )

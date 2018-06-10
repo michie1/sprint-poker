@@ -33,9 +33,6 @@ import('./src/Main.elm').then(Elm => {
 
       // Number of online users is the number of objects in the presence list.
       listRef.on("value", function(snap) {
-        console.log("# of online users = " + snap.numChildren());
-        console.log(snap.val());
-
         app.ports.infoForElm.send({
           tag: 'UsersLoaded',
           data: Object.values(snap.val())

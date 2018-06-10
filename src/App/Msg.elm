@@ -5,7 +5,7 @@ import App.OutsideInfo exposing (InfoForElm)
 
 type Msg
     = Outside InfoForElm
-    | SetName String
+    | OnInputName String
     | SetPoints Int
     | Reset
     | LogErr String
