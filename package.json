@@ -4,7 +4,8 @@
   "description": "A parcel plugin that enables elm support",
   "main": "index.js",
   "scripts": {
-    "start": "parcel serve index.html --no-cache"
+    "start": "parcel serve index.html --no-cache",
+    "deploy": "./deploy.sh"
   },
   "author": "Michiel",
   "license": "ISC",
