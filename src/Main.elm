@@ -142,7 +142,7 @@ update msg model =
         Msg.Outside infoForElm ->
             case infoForElm of
                 App.OutsideInfo.SignedIn uid ->
-                    ( { model | uid = Just uid, name = uid }, Cmd.none )
+                    ( { model | uid = Just uid, name = String.slice 0 5 uid }, Cmd.none )
 
                 App.OutsideInfo.Users users ->
                     let
