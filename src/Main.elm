@@ -122,18 +122,13 @@ update msg model =
 
         Msg.OnInputName name ->
             let
-                newName =
+                cmd =
                     if name == "" then
-                        case model.uid of
-                            Just uid ->
-                                uid
-
-                            Nothing ->
-                                ""
+                        Cmd.none
                     else
-                        name
+                        App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.SetName name
             in
-                ( { model | name = newName }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.SetName newName )
+                ( { model | name = name }, cmd )
 
         Msg.SetPoints points ->
             ( { model | points = Just points }, App.OutsideInfo.sendInfoOutside <| App.OutsideInfo.SetPoints points )
