@@ -1,5 +1,4 @@
 import('./src/Main.elm').then(({ Elm }) => {
-  const mountNode = document.getElementById('app');
   const app = Elm.Main.init({
     node: document.getElementById('app'),
   });
