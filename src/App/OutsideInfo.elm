@@ -21,7 +21,7 @@ sendInfoOutside info =
             infoForOutside { tag = "SetName", data = Json.Encode.string name }
 
         SetPoints points ->
-            infoForOutside { tag = "SetPoints", data = Json.Encode.int points }
+            infoForOutside { tag = "SetPoints", data = Json.Encode.string points }
 
         Reset ->
             infoForOutside { tag = "Reset", data = Json.Encode.bool True }
@@ -70,7 +70,7 @@ getInfoFromOutside tagger onError =
 type InfoForOutside
     = Hi Json.Encode.Value
     | SetName String
-    | SetPoints Int
+    | SetPoints String
     | Reset
     | RemoveUser String
     | LogError String

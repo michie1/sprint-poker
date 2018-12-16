@@ -17,23 +17,26 @@ type alias Flags =
 -- MODEL
 
 
-effortPoints : List Int
+effortPoints : List String
 effortPoints =
-    [ 1
-    , 2
-    , 3
-    , 5
-    , 8
-    , 13
-    , 21
-    , 34
+    [ "?"
+    , "1"
+    , "2"
+    , "3"
+    , "5"
+    , "8"
+    , "13"
+    , "21"
+    , "34"
+    , "100"
+    , "ScrumMasterScore"
     ]
 
 
 type alias Model =
     { name : String
     , uid : Maybe String
-    , points : Maybe Int
+    , points : Maybe String
     , users : Maybe (List User)
     , removed : Bool
     }
@@ -65,7 +68,7 @@ view model =
             let
                 pointsText = case model.points of
                     Just points ->
-                        String.fromInt points
+                        points
                     Nothing ->
                         ""
             in
@@ -77,7 +80,7 @@ view model =
                     , li [] [ input [ onInput Msg.OnInputName, value model.name ] [] ]
                     ]
                         , div [] <|
-                            List.map (\points -> button [ onClick <| Msg.SetPoints points ] [ text (String.fromInt points) ]) effortPoints
+                            List.map (\points -> button [ onClick <| Msg.SetPoints points ] [ text points ]) effortPoints
                                 , button [ onClick Msg.Reset ] [ text "Reset" ]
                                 , h2 [] [ text "Users" ]
                                 , showUsers users
@@ -101,7 +104,7 @@ showUsers users =
                         if noNothingPoints then
                             case user.points of
                                 Just val ->
-                                    String.fromInt val
+                                    val
 
                                 Nothing ->
                                     "0"
