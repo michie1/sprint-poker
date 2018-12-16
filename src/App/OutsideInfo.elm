@@ -1,9 +1,8 @@
-port module App.OutsideInfo exposing (sendInfoOutside, InfoForOutside, InfoForOutside(..), InfoForElm, InfoForElm(..), getInfoFromOutside)
-
-import Json.Encode
-import Json.Decode exposing (decodeValue)
+port module App.OutsideInfo exposing (InfoForElm(..), InfoForOutside(..), getInfoFromOutside, sendInfoOutside)
 
 import Data.User exposing (User, usersDecoder)
+import Json.Decode exposing (decodeValue)
+import Json.Encode
 
 
 port infoForOutside : GenericOutsideData -> Cmd msg
@@ -38,33 +37,33 @@ getInfoFromOutside : (InfoForElm -> msg) -> (String -> msg) -> Sub msg
 getInfoFromOutside tagger onError =
     infoForElm
         (\outsideInfo ->
-                case outsideInfo.tag of
-                    "SignedIn" ->
-                        case decodeValue Json.Decode.string outsideInfo.data of
-                            Ok id ->
-                                tagger <| SignedIn id
+            case outsideInfo.tag of
+                "SignedIn" ->
+                    case decodeValue Json.Decode.string outsideInfo.data of
+                        Ok id ->
+                            tagger <| SignedIn id
 
-                            Err e ->
-                                onError e
+                        Err e ->
+                            onError "SignedIn error"
 
-                    "UsersLoaded" ->
-                            case decodeValue usersDecoder outsideInfo.data of
-                                Ok users ->
-                                    tagger <| Users users
+                "UsersLoaded" ->
+                    case decodeValue usersDecoder outsideInfo.data of
+                        Ok users ->
+                            tagger <| Users users
 
-                                Err e ->
-                                    onError e
+                        Err e ->
+                            onError "UsersLoaded error"
 
-                    "UserRemoved" ->
-                        case decodeValue Json.Decode.bool outsideInfo.data of
-                            Ok _ ->
-                                tagger <| UserRemoved
+                "UserRemoved" ->
+                    case decodeValue Json.Decode.bool outsideInfo.data of
+                        Ok _ ->
+                            tagger <| UserRemoved
 
-                            Err e ->
-                                onError e
-                            
-                    _ ->
-                        onError <| "Unexpected info from outside: " ++ toString outsideInfo
+                        Err e ->
+                            onError "UserRemoved error"
+
+                _ ->
+                    onError <| "Unexpected info from outside: " ++ Debug.toString outsideInfo
         )
 
 
@@ -81,6 +80,7 @@ type InfoForElm
     = SignedIn String
     | UserRemoved
     | Users (List User)
+
 
 type alias GenericOutsideData =
     { tag : String

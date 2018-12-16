@@ -1,4 +1,4 @@
-module App.Msg exposing (Msg, Msg(..))
+module App.Msg exposing (Msg(..))
 
 import App.OutsideInfo exposing (InfoForElm)
 import Data.User exposing (User)

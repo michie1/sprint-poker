@@ -1,6 +1,8 @@
-import('./src/Main.elm').then(Elm => {
+import('./src/Main.elm').then(({ Elm }) => {
   const mountNode = document.getElementById('app');
-  const app = Elm.Main.embed(mountNode);
+  const app = Elm.Main.init({
+    node: document.getElementById('app'),
+  });
   const config = require('./config');
 
 
